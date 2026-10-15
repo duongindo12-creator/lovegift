@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Món Quà Kỷ Niệm</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050505;
+        }
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+        .ui-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            pointer-events: auto;
+        }
+        .icon-btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .letter-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 90%;
+            max-width: 400px;
+            background: linear-gradient(135deg, #fff0f5, #ffe4e1);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 20;
+            text-align: center;
+            transition: transform 0.4s ease;
+            pointer-events: auto;
+            border: 2px solid #ffb6c1;
+            font-family: sans-serif;
+        }
+        .letter-modal.active {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .letter-modal h2 {
+            color: #d1477a;
+            margin-bottom: 15px;
+        }
+        .letter-modal p {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .close-letter {
+            background: #ff4d79;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="heartCanvas"></canvas>
+
+    <div class="ui-layer">
+        <div class="top-bar">
+            <button class="icon-btn" id="soundBtn">🎵</button>
+            <button class="icon-btn" id="letterBtn">💌</button>
+        </div>
+    </div>
+
+    <div class="letter-modal" id="letterModal">
+        <h2>Gửi Phương Anh! 💖</h2>
+        <p>Cảm ơn em vì đã luôn ở bên anh. Chúc em luôn xinh đẹp, ngập tràn niềm vui và hạnh phúc nhé!</p>
+        <button class="close-letter" id="closeBtn">Đóng lại</button>
+    </div>
+
+    <audio id="bgMusic" loop></audio>
+
+    <script>
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Hiệu ứng hạt trái tim bay
+        const particles = [];
+        for (let i = 0; i < 600; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2 + 1,
+                speedX: (Math.random() - 0.5) * 1.2,
+                speedY: (Math.random() - 0.5) * 1.2
+            });
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.25)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#ff4d79';
+            particles.forEach(p => {
+                p.x += p.speedX;
+                p.y += p.speedY;
+                if (p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height) {
+                    p.x = Math.random() * canvas.width;
+                    p.y = Math.random() * canvas.height;
+                }
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Xử lý nút bấm mở thư
+        const letterBtn = document.getElementById('letterBtn');
+        const letterModal = document.getElementById('letterModal');
+        const closeBtn = document.getElementById('closeBtn');
+
+        letterBtn.addEventListener('click', () => {
+            letterModal.classList.add('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            letterModal.classList.remove('active');
+        });
+
+        // Xử lý nút âm thanh giả lập
+        const soundBtn = document.getElementById('soundBtn');
+        let isPlaying = false;
+        soundBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            soundBtn.textContent = isPlaying ? '🔇' : '🎵';
+        });
+    </script>
+</body>
+</html>
